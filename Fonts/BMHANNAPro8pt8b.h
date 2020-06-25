@@ -5412,6 +5412,8 @@ const uint8_t BMHANNAPro8pt8bBitmaps[] PROGMEM = {
   0x60, 0x18, 0x7F, 0xED, 0xF9, 0xB3, 0x36, 0x66, 0xCC, 0xDF, 0x98, 0x00,
   0x00, 0x07, 0xFD, 0xC1, 0xB8, 0x33, 0xFE };
 
+
+// 1.Index, 2.W, 3.H, 4.xAdv, 5.dX, 6.dY
 const GFXglyph BMHANNAPro8pt8bGlyphs[] PROGMEM = {
   {     0,   0,   0,   5,    0,    1 },   // 0x00
   {     0,   0,   0,   5,    0,    1 },   // 0x01
@@ -55917,7 +55919,7 @@ const GFXglyph BMHANNAPro8pt8bGlyphs[] PROGMEM = {
   { 38000,  12,  14,  13,    1,  -11 },   // 0xC545
   { 38021,   0,   0,  15,    0,    1 },   // 0xC546
   { 38021,   0,   0,  15,    0,    1 },   // 0xC547
-  { 38021,  13,  13,  13,    1,  -10 },   // 0xC548
+  { 38021,  13,  13,  14,    1,  -10 },   // 0xC548
   { 38043,  12,  13,  13,    1,  -10 },   // 0xC549
   { 38063,  13,  13,  13,    1,  -10 },   // 0xC54A
   { 38085,   0,   0,  15,    0,    1 },   // 0xC54B
