@@ -1470,12 +1470,6 @@ void Adafruit_GFX::charBounds(uint8_t data, int16_t *x, int16_t *y,
                 int8_t  xo = pgm_read_byte(&glyph->xOffset),
                         yo = pgm_read_byte(&glyph->yOffset);
 
-                Serial.print("width :"); Serial.println(gw);             
-                Serial.print("height : "); Serial.println(gh);
-                Serial.print("xAdvance : "); Serial.println(xa);
-                Serial.print("xOffset : "); Serial.println(xo);
-                Serial.print("yOffset : "); Serial.println(yo);
-
                 if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width)) { 
                     *x  = 0; // Reset x to zero, advance y by one line
                     *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
