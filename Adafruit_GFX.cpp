@@ -1447,43 +1447,26 @@ void Adafruit_GFX::setFont(const GFXfont *f) {
     @param    maxy  Maximum clipping value for Y
 */
 /**************************************************************************/
-void Adafruit_GFX::charBounds(uint8_t data, int16_t *x, int16_t *y,
+void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
   int16_t *minx, int16_t *miny, int16_t *maxx, int16_t *maxy) {
-    uint16_t c = (uint16_t)data;
-    if (_utf8) c = decodeUTF8(data);
-
 
     if(gfxFont) {
-        Serial.println("gfxFont");
 
         if(c == '\n') { // Newline?
-            Serial.println("************* Newline ***********");
-
             *x  = 0;    // Reset x to zero, advance y by one line
             *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
         } else if(c != '\r') { // Not a carriage return; is normal char
-            Serial.println("*************  Not a carriage return; is normal char ***********");
             uint16_t first = pgm_read_word(&gfxFont->first),
                      last  = pgm_read_word(&gfxFont->last);
             if((c >= first) && (c <= last)) { // Char present in this font?
-                Serial.println("*************Char present in this font? ***********");
                 GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
                   &gfxFont->glyph))[c - first]);
-                uint8_t gw = pgm_read_word(&glyph->width),
-                        gh = pgm_read_word(&glyph->height),
-                        xa = pgm_read_word(&glyph->xAdvance);
-                int8_t  xo = pgm_read_word(&glyph->xOffset),
-                        yo = pgm_read_word(&glyph->yOffset);
-
-                Serial.print("width :"); Serial.println(gw);
-                Serial.print("height : "); Serial.println(gh);
-                Serial.print("xAdvance : "); Serial.println(xa);
-                Serial.print("xOffset : "); Serial.println(xo);
-                Serial.print("yOffset : "); Serial.println(yo);
-
+                uint8_t gw = pgm_read_byte(&glyph->width),
+                        gh = pgm_read_byte(&glyph->height),
+                        xa = pgm_read_byte(&glyph->xAdvance);
+                int8_t  xo = pgm_read_byte(&glyph->xOffset),
+                        yo = pgm_read_byte(&glyph->yOffset);
                 if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width)) {
-                    Serial.println("*************if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width))  ***********");
-
                     *x  = 0; // Reset x to zero, advance y by one line
                     *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
                 }
@@ -1498,12 +1481,9 @@ void Adafruit_GFX::charBounds(uint8_t data, int16_t *x, int16_t *y,
                 if(y2 > *maxy) *maxy = y2;
                 *x += xa * ts;
             }
-
-            
         }
 
     } else { // Default font
-                Serial.println("Defalut Font");
 
         if(c == '\n') {                     // Newline?
             *x  = 0;                        // Reset x to zero,
@@ -1539,9 +1519,8 @@ void Adafruit_GFX::charBounds(uint8_t data, int16_t *x, int16_t *y,
 /**************************************************************************/
 void Adafruit_GFX::getTextBounds(const char *str, int16_t x, int16_t y,
         int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
-    Serial.println("getTextBounds_Char");
-
     uint8_t c; // Current character
+
     *x1 = x;
     *y1 = y;
     *w  = *h = 0;
@@ -1575,8 +1554,6 @@ void Adafruit_GFX::getTextBounds(const char *str, int16_t x, int16_t y,
 /**************************************************************************/
 void Adafruit_GFX::getTextBounds(const String &str, int16_t x, int16_t y,
         int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
-    Serial.println("getTextBounds_String");
-
     if (str.length() != 0) {
         getTextBounds(const_cast<char*>(str.c_str()), x, y, x1, y1, w, h);
     }
@@ -1598,8 +1575,6 @@ void Adafruit_GFX::getTextBounds(const String &str, int16_t x, int16_t y,
 void Adafruit_GFX::getTextBounds(const __FlashStringHelper *str,
         int16_t x, int16_t y, int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
     uint8_t *s = (uint8_t *)str, c;
-    Serial.println("getTextBounds__FlashStringHelper");
-
 
     *x1 = x;
     *y1 = y;
