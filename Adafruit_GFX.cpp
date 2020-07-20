@@ -1447,12 +1447,15 @@ void Adafruit_GFX::setFont(const GFXfont *f) {
     @param    maxy  Maximum clipping value for Y
 */
 /**************************************************************************/
-void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
+void Adafruit_GFX::charBounds(uint8_t data, int16_t *x, int16_t *y,
   int16_t *minx, int16_t *miny, int16_t *maxx, int16_t *maxy) {
+    uint16_t c = (uint16_t)data;
+    if (_utf8) c = decodeUTF8(data);
 
     if(gfxFont) {
 
         if(c == '\n') { // Newline?
+
             *x  = 0;    // Reset x to zero, advance y by one line
             *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
         } else if(c != '\r') { // Not a carriage return; is normal char
@@ -1466,7 +1469,8 @@ void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
                         xa = pgm_read_byte(&glyph->xAdvance);
                 int8_t  xo = pgm_read_byte(&glyph->xOffset),
                         yo = pgm_read_byte(&glyph->yOffset);
-                if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width)) {
+
+                if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width)) { 
                     *x  = 0; // Reset x to zero, advance y by one line
                     *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
                 }
@@ -1481,6 +1485,7 @@ void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
                 if(y2 > *maxy) *maxy = y2;
                 *x += xa * ts;
             }
+            
         }
 
     } else { // Default font
@@ -1520,7 +1525,6 @@ void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
 void Adafruit_GFX::getTextBounds(const char *str, int16_t x, int16_t y,
         int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
     uint8_t c; // Current character
-
     *x1 = x;
     *y1 = y;
     *w  = *h = 0;

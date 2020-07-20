@@ -136,7 +136,7 @@ class Adafruit_GFX : public Print {
 
   protected:
   void
-    charBounds(char c, int16_t *x, int16_t *y,
+    charBounds(uint8_t data, int16_t *x, int16_t *y,                  
       int16_t *minx, int16_t *miny, int16_t *maxx, int16_t *maxy);
   const int16_t
     WIDTH,          ///< This is the 'raw' display width - never changes
