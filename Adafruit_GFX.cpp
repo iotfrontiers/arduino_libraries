@@ -953,7 +953,6 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
     endWrite();
 }
 
-
 /**************************************************************************/
 /*!
    @brief   Draw a PROGMEM-resident 16-bit image (RGB 5/6/5) with a 1-bit mask (set bits = opaque, unset bits = clear) at the specified (x,y) position. BOTH buffers (color and mask) must be PROGMEM-resident. For 16-bit display devices; no color reduction performed.
@@ -1189,8 +1188,61 @@ uint16_t Adafruit_GFX::decodeUTF8(uint8_t c)
     @param  utf8  The 8-bit UTF-8 or ASCII code
 */
 /**************************************************************************/
+size_t Adafruit_GFX::write(uint8_t data, uint16_t _textColor, bool isColorText) {
+    // Serial.printf("_textColor : %d \n", _textColor);
+    uint16_t c = (uint16_t)data;
+    textcolor = _textColor;
+
+    if (_utf8) c = decodeUTF8(data);
+
+    if (c == 0) return 1;
+
+    if(!gfxFont) { // 'Classic' built-in font
+        if (c > 255) return 1;                 // Stop 16 bit characters
+        if(c == '\n') {                        // Newline?
+            cursor_x  = 0;                     // Reset x to zero,
+            cursor_y += textsize * 8;          // advance y one line
+        } else if(c != '\r') {                 // Ignore carriage returns
+            if(wrap && ((cursor_x + textsize * 6) > _width)) { // Off right?
+                cursor_x  = 0;                 // Reset x to zero,
+                cursor_y += textsize * 8;      // advance y one line
+            }
+            drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+            cursor_x += textsize * 6;          // Advance x one char
+        }
+
+    } else { // Custom font
+
+        if(c == '\n') {
+            cursor_x  = 0;
+            cursor_y += (int16_t)textsize *
+                        (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+        } else if(c != '\r') {
+            uint16_t first = pgm_read_word(&gfxFont->first);
+            if((c >= first) && (c <= pgm_read_word(&gfxFont->last))) {
+                GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
+                  &gfxFont->glyph))[c - first]);
+                uint8_t   w     = pgm_read_byte(&glyph->width),
+                          h     = pgm_read_byte(&glyph->height);
+                if((w > 0) && (h > 0)) { // Is there an associated bitmap?
+                    int16_t xo = (int8_t)pgm_read_byte(&glyph->xOffset); // sic
+                    if(wrap && ((cursor_x + textsize * (xo + w)) > _width)) {
+                        cursor_x  = 0;
+                        cursor_y += (int16_t)textsize *
+                          (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+                    }
+                    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+                }
+                cursor_x += (uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+            }
+        }
+
+    }
+    return 1;
+}
+
 size_t Adafruit_GFX::write(uint8_t data) {
-  
+    
     uint16_t c = (uint16_t)data;
     if (_utf8) c = decodeUTF8(data);
 
