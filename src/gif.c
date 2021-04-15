@@ -286,18 +286,67 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                 for (i=0; i<(1<<iColorTableBits); i++)
                 {
                     uint16_t usRGB565;
+                    // color 565
                     usRGB565 = ((p[iOffset] >> 3) << 11); // R
                     usRGB565 |= ((p[iOffset+1] >> 2) << 5); // G
                     usRGB565 |= (p[iOffset+2] >> 3); // B
+
+                    byte red = ((p[iOffset] >> 3) << 11);
+                    byte green = ((p[iOffset+1] >> 2) << 5);
+                    byte blue =  (p[iOffset+2] >> 3); // B
+
+                    
+                    // color 555
+                    
+                    // byte red = (p[iOffset] & 0x1f);
+                    // byte green = ((p[iOffset+1] & 0x1f) << 5);
+                    // byte blue = ((p[iOffset+2] & 0x1f) << 10);
+
+
+                    // if (p[iOffset] >= 31)
+                    //     p[iOffset] = 31;
+                    // usRGB565 = (p[iOffset] & 0x1f); // R
+                    // if (p[iOffset+1] >= 31)
+                    //     p[iOffset+1] = 31;
+                    // usRGB565 |= ((p[iOffset+1] & 0x1f) << 5); // G
+                    // if (p[iOffset+2] >= 31)
+                    // p[iOffset+2] = 31;
+                    // usRGB565 |= ((p[iOffset+2] & 0x1f) << 10); // B
+
+                    // color origin
+
+                    // if (p[iOffset] >= 31)
+                    //     p[iOffset] = 31;
+                    // usRGB565 = p[iOffset]; // R
+                    // if (p[iOffset+1] >= 31)
+                    //     p[iOffset+1] = 31;
+                    // usRGB565 |= p[iOffset+1]; // G
+                    // if (p[iOffset+2] >= 31)
+                    //     p[iOffset+2] = 31;
+                    // usRGB565 |= p[iOffset+2]; // B
+                   
+                    // log_i(" red : %d \n", red);
+                    // log_i(" green : %d \n", green);
+                    // log_i(" blue : %d \n", blue);
+
+                    // log_i("usRGB565---------------------------- ");
+                    // for (int i = 7; i >= 0; --i) { //8자리 숫자까지 나타냄
+                    //     uint16_t result = usRGB565 >> i & 1;
+                    //     log_i("%d", result);
+                    // }
+
                     if (pPage->ucLittleEndian)
                         pPage->pPalette[i] = usRGB565;
-                    else
+                    else {
+                        log_i(" SPI wants MSB first");
                         pPage->pPalette[i] = __builtin_bswap16(usRGB565); // SPI wants MSB first
+                    }
                     iOffset += 3;
                 }
             }
             else // just copy it as-is
             {
+                log_i("just copy it as-is");
                 memcpy(pPage->pPalette, &p[iOffset], (1<<iColorTableBits) * 3);
                 iOffset += (1 << iColorTableBits) * 3;
             }
@@ -432,15 +481,19 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                 usRGB565 = ((p[iOffset] >> 3) << 11); // R
                 usRGB565 |= ((p[iOffset+1] >> 2) << 5); // G
                 usRGB565 |= (p[iOffset+2] >> 3); // B
+
                 if (pPage->ucLittleEndian)
                     pPage->pLocalPalette[i] = usRGB565;
-                else
+                else {
+                                    log_i(" SPI wants MSB first");
                     pPage->pLocalPalette[i] = __builtin_bswap16(usRGB565); // SPI wants MSB first
+                }
                 iOffset += 3;
             }
         }
         else // just copy it as-is
         {
+            log_i("just copy it as-is");
             memcpy(pPage->pLocalPalette, &p[iOffset], j * 3);
             iOffset += j*3;
         }
@@ -711,6 +764,8 @@ static void ConvertNewPixels(GIFIMAGE *pPage, GIFDRAW *pDraw)
     {
         uint16_t *pPal, *pu16;
         pPal = (uint16_t *)pDraw->pPalette;
+                        log_i("just copy it as-is");
+
         pu16 = (uint16_t *)d;
         for (x=0; x<pPage->iWidth; x++)
         {
@@ -721,6 +776,8 @@ static void ConvertNewPixels(GIFIMAGE *pPage, GIFDRAW *pDraw)
     {
         uint8_t *pPal;
         int pixel;
+                        log_i("just copy it as-is");
+
         pPal = (uint8_t *)pDraw->pPalette;
         for (x=0; x<pPage->iWidth; x++)
         {
