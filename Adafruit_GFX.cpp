@@ -130,9 +130,9 @@ void Adafruit_GFX::writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
 
     for (; x0<=x1; x0++) {
         if (steep) {
-            writePixel(y0, x0, color);
+            drawPixelEx(y0, x0, color);
         } else {
-            writePixel(x0, y0, color);
+            drawPixelEx(x0, y0, color);
         }
         err -= dy;
         if (err < 0) {
@@ -161,6 +161,10 @@ void Adafruit_GFX::startWrite(){
 void Adafruit_GFX::writePixel(int16_t x, int16_t y, uint16_t color){
     drawPixel(x, y, color);
 }
+
+void Adafruit_GFX::drawPixelEx(int16_t x, int16_t y, uint16_t color){
+}
+
 
 /**************************************************************************/
 /*!
@@ -721,7 +725,6 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
 /**************************************************************************/
 void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
   uint8_t *bitmap, int16_t w, int16_t h, uint16_t color) {
-
     int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
     uint8_t byte = 0;
 
@@ -760,6 +763,101 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
             if(i & 7) byte <<= 1;
             else      byte   = bitmap[j * byteWidth + i / 8];
             writePixel(x+i, y, (byte & 0x80) ? color : bg);
+        }
+    }
+    endWrite();
+}
+
+void Adafruit_GFX::drawBitmapEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg) {
+
+    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+    uint8_t byte = 0;
+    int16_t x = 0, y = 0;
+
+    startWrite();
+    int16_t idx = 0;
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = xOffset - 7; i < w && idx <= 78; i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+idx - 7, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel(x+idx - 7, y, color);
+                else if (bg != 0) writePixel(x+idx - 7, y, bg);
+            }
+            idx = 0;
+        }
+    } else if(xOffset > 0) {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) && idx <= 64;i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel((x + i + xOffset), y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i + xOffset), y, color);
+                else if (bg != 0) writePixel((x + i + xOffset), y, bg);
+            }
+            idx = 0;
+        }
+    } else {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i=0; i<w; i++ ) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+i, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i), y, color);
+                else if (bg != 0) writePixel((x + i), y, bg);
+            }
+        }
+    }
+    endWrite();
+}
+
+void Adafruit_GFX::drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg) {
+
+    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+    uint8_t byte = 0;
+    int16_t x = 0, y = 0;
+
+    color = 0;  //  text draw black clear
+    bg = 0;     //  background draw black clear
+
+    startWrite();
+    int16_t idx = 0;
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = xOffset - 7; i < w && idx <= 78; i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+idx - 7, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel(x+idx - 7, y, 0);
+                else if (bg != 0) writePixel(x+idx - 7, y, 0);
+            }
+            idx = 0;
+        }
+    } else if(xOffset > 0) {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) && idx <= 64;i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel((x + i + xOffset), y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i + xOffset), y, 0);
+                else if (bg != 0) writePixel((x + i + xOffset), y, 0);
+            }
+            idx = 0;
+        }
+    } else {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i=0; i<w; i++ ) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+i, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i), y, 0);
+                else if (bg != 0) writePixel((x + i), y, 0);
+            }
         }
     }
     endWrite();
@@ -843,7 +941,6 @@ void Adafruit_GFX::drawGrayscaleBitmap(int16_t x, int16_t y,
     }
     endWrite();
 }
-
 
 /**************************************************************************/
 /*!
@@ -951,6 +1048,64 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
         }
     }
     endWrite();
+}
+
+void Adafruit_GFX::drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h) {
+    startWrite();  
+    
+    // Serial.printf("before xOffset : %d \n", xOffset);
+    int16_t idx = 0;
+    int16_t x = 0, y = yOffset;
+
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i= xOffset; i<w; i++, idx++) {
+                if ((bitmap[j * w + i]) != 0)   writePixel(x+idx, y, bitmap[j * w + i]);
+            }
+            idx = 0;
+        }
+        // Serial.printf("음수 after xOffset : %d \n", xOffset);
+    } else {     // y = j, i = w
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) ; i++) {
+                if ((bitmap[j * w + i]) != 0)   writePixel((x+i+xOffset), y, bitmap[j * w + i]);
+            }
+        }
+        // Serial.printf("양수 after xOffset : %d \n", xOffset);
+    }  
+    endWrite();
+    //        buffer[x + y * WIDTH] = color;
+}
+
+void Adafruit_GFX::drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h) {
+    startWrite();  
+    
+    // Serial.printf("before xOffset : %d \n", xOffset);
+    int16_t idx = 0;
+    int16_t x = 0, y = yOffset;
+
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i= xOffset; i<w; i++, idx++) {
+                if ((bitmap[j * w + i]) != 0) writePixel(x+idx, y, 0);
+            }
+            idx = 0;
+        }
+        // Serial.printf("음수 after xOffset : %d \n", xOffset);
+    } else {     // y = j, i = w
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) ; i++) {
+                if ((bitmap[j * w + i]) != 0) writePixel((x+i+xOffset), y, 0);
+            }
+        }
+        // Serial.printf("양수 after xOffset : %d \n", xOffset);
+    }  
+    endWrite();
+    //        buffer[x + y * WIDTH] = color;
 }
 
 /**************************************************************************/

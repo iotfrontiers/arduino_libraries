@@ -26,6 +26,8 @@ class Adafruit_GFX : public Print {
   // These MAY be overridden by the subclass to provide device-specific
   // optimized code.  Otherwise 'generic' versions are used.
   virtual void startWrite(void);
+  virtual void drawPixelEx(int16_t x, int16_t y, uint16_t color);
+
   virtual void writePixel(int16_t x, int16_t y, uint16_t color);
   virtual void writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   virtual void writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
@@ -54,6 +56,16 @@ class Adafruit_GFX : public Print {
 
   // These exist only with Adafruit_GFX (no subclass overrides)
   void
+    drawBitmapEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),   
+    
+    drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),     
+    drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h),   
+    drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h), 
+
     drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
     drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,
       uint16_t color),
@@ -114,6 +126,7 @@ class Adafruit_GFX : public Print {
 
   // Serial UTF-8 decoder
   uint16_t decodeUTF8(uint8_t c);
+  boolean border_blink = false;
 
 #if ARDUINO >= 100
   virtual size_t write(uint8_t);
@@ -163,6 +176,7 @@ class Adafruit_GFX : public Print {
 
   uint8_t  decoderState = 0;   // UTF-8 decoder state
   uint16_t decoderBuffer;      // Unicode code-point buffer
+
 };
 
 
