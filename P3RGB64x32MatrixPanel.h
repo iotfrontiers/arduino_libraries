@@ -17,41 +17,38 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     }
     void begin(void);
     void stop(void);
-    virtual void drawPixel(int16_t x, int16_t y, uint16_t color);
-
+    virtual void drawPixel(int16_t x, int16_t y, uint16_t color);   //  제한 없이 그림
+    virtual void drawPixelEx(int16_t x, int16_t y, uint16_t color); //  Flag 에 따라 제한적으로 그림
     uint16_t color444(uint8_t r, uint8_t g, uint8_t b) { return ((r & 0xf) << 1) | ((uint16_t)(g & 0xf) << 6) | ((uint16_t)(b & 0xf) << 11); }
+
     uint16_t color555(uint8_t r, uint8_t g, uint8_t b) { return (r&0x1f) | ((uint16_t)(g & 0x1f) << 5) | ((uint16_t)(b & 0x1f) << 10); }
+    uint16_t drawPixelRGB565(uint16_t color);
+
     uint16_t colorHSV(long hue, uint8_t sat, uint8_t val);
+
+    void clearMatrix();
+    void setDrawTimer(int timer);
+    void nonOverWriteDrawPixel(int16_t x, int16_t y, uint16_t color, uint8_t flag); //  사용중인 LED에 덮어쓰지 않음
 
     void swapBuffer() {
       matrixbuff = drawBuffer();
     }
 
-    uint16_t* matrixbuff;
-    std::vector<std::array<uint16_t, 64*32>> _matrixbuff;
+    uint16_t* matrixbuff;   //  Direct Matrix Buffer
+    uint16_t _matrixbuff[64*32];  //  Temp Matrix Buffer
 
     void copyBuffer() {
-      if (!doubleBuffer) return;
-      if (matrixbuff == _matrixbuff[0].data())
-        _matrixbuff[0] = _matrixbuff[1];
-      else
-        _matrixbuff[1] = _matrixbuff[0];
     }
 
   private:
     void initMatrixBuff() {
-      _matrixbuff.resize(doubleBuffer ? 2 : 1);
-      matrixbuff = _matrixbuff[0].data();
+      matrixbuff = _matrixbuff;
     }
     static void IRAM_ATTR onTimer(void);
     void IRAM_ATTR draw();
 
     uint16_t* drawBuffer() {
-      if (!doubleBuffer) return _matrixbuff[0].data();
-      if (matrixbuff == _matrixbuff[0].data())
-        return _matrixbuff[1].data();
-      else
-        return _matrixbuff[0].data();
+      if (!doubleBuffer) return _matrixbuff;
     }
 
     hw_timer_t* timer;
@@ -74,8 +71,39 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
 
     bool doubleBuffer;
 
+    int timer_period = 70;
+
     static volatile SemaphoreHandle_t timerSemaphore;
     static P3RGB64x32MatrixPanel *singleton;
 };
+
+inline uint16_t P3RGB64x32MatrixPanel::drawPixelRGB565(uint16_t color) 
+{
+  uint8_t r = ((((color >> 11) & 0x1F) * 527) + 23) >> 6;
+  uint8_t g = ((((color >> 5) & 0x3F) * 259) + 33) >> 6;
+  uint8_t b = (((color & 0x1F) * 527) + 23) >> 6;
+
+  r /= 8;
+  g /= 8;
+  b /= 8;
+  // Serial.printf("red : %d, green : %d, blue : %d \n", r, g, b);
+  return color555(r, g, b);
+}
+
+inline void P3RGB64x32MatrixPanel::clearMatrix() {
+  // memset( _matrixbuff, 0, sizeof(uint16_t) /* (64 * 32)); /* all dot clear */
+  int xOffset = 0;
+  int yOffset = 0;
+  if (this->border_blink) {
+    // Serial.println("border_blink");
+    xOffset++;
+    yOffset++;
+  }
+  for (int y = (0 + yOffset); y < (32 - yOffset); y ++) {
+    // writePixel(x+i, y, bitmap[j * w + i]);
+      // int16_t idx = x + y * 64;
+    memset(&_matrixbuff[y * 64 + xOffset], 0, (sizeof(uint16_t) * (64 - (xOffset * 2))));
+  }
+}
 
 #endif

@@ -39,7 +39,7 @@ void P3RGB64x32MatrixPanel::begin() {
   timerSemaphore = xSemaphoreCreateBinary();
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
-  timerAlarmWrite(timer, 30, true);
+  timerAlarmWrite(timer,30, true);
   timerAlarmEnable(timer);
 }
 
@@ -80,12 +80,32 @@ uint16_t P3RGB64x32MatrixPanel::colorHSV(long hue, uint8_t sat, uint8_t val) {
   return color555(r, g, b);
 }
 
-void P3RGB64x32MatrixPanel::drawPixel(int16_t x, int16_t y, uint16_t color) {
-  if (x < 0 || x >= 64 || y < 0 || y >= 32) return;
+void P3RGB64x32MatrixPanel::drawPixelEx(int16_t x, int16_t y, uint16_t color) {
+  if (x < 0 || x >= 64 || y < 0  || y >= 32 ) return;
   int16_t idx = x + y * 64;
   drawBuffer()[idx] = color;
 }
 
+void P3RGB64x32MatrixPanel::drawPixel(int16_t x, int16_t y, uint16_t color) {
+  int border_offSet = 0;
+  if (this->border_blink) {
+    border_offSet++;
+    // Serial.println("border_blink true");
+  }
+  if (x < 0 + border_offSet || x >= 64 - border_offSet || y < 0 + border_offSet || y >= 32 - border_offSet) return;
+  int16_t idx = x + y * 64;
+  drawBuffer()[idx] = color;
+}
+
+void P3RGB64x32MatrixPanel::nonOverWriteDrawPixel(int16_t x, int16_t y, uint16_t color, uint8_t flag) { //  flag 0  = draw, flag 1 = clear
+  if (x < 0 || x >= 64 || y < 0  || y >= 32 ) return;
+  int16_t idx = x + y * 64;
+  if (drawBuffer()[idx] == 0 && flag == 0) {
+    drawBuffer()[idx] = color;
+  } else if (drawBuffer()[idx] == color && flag == 1) {
+    drawBuffer()[idx] = 0;
+  }
+}
 void IRAM_ATTR P3RGB64x32MatrixPanel::draw() {
   static byte cnt = 30;
   static byte y = 15;
@@ -129,4 +149,9 @@ void IRAM_ATTR P3RGB64x32MatrixPanel::draw() {
   for (int x = 0; x < 8; x++) NOP(); // to wait latch and row switch
 
   REG_WRITE(GPIO_OUT1_W1TC_REG, (1 << (pinOE - 32)) | (1 << (pinLAT - 32)));
+}
+
+void P3RGB64x32MatrixPanel::setDrawTimer(int timer) {
+  this->timer_period = timer;
+  // Serial.printf(" timer : %d \n", this->timer_period);
 }
