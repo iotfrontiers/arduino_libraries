@@ -773,7 +773,7 @@ void Adafruit_GFX::drawBitmapEx(int16_t xOffset, int16_t yOffset,
 
     int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
     uint8_t byte = 0;
-    int16_t x = 0, y = 0;
+    int16_t x = 0, y = yOffset;
 
     startWrite();
     int16_t idx = 0;
@@ -819,7 +819,7 @@ void Adafruit_GFX::drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
 
     int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
     uint8_t byte = 0;
-    int16_t x = 0, y = 0;
+    int16_t x = 0, y = yOffset;
 
     color = 0;  //  text draw black clear
     bg = 0;     //  background draw black clear
