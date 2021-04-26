@@ -91,19 +91,23 @@ inline uint16_t P3RGB64x32MatrixPanel::drawPixelRGB565(uint16_t color)
 }
 
 inline void P3RGB64x32MatrixPanel::clearMatrix() {
-  // memset( _matrixbuff, 0, sizeof(uint16_t) /* (64 * 32)); /* all dot clear */
-  int xOffset = 0;
-  int yOffset = 0;
-  if (this->border_blink) {
-    // Serial.println("border_blink");
-    xOffset++;
-    yOffset++;
-  }
-  for (int y = (0 + yOffset); y < (32 - yOffset); y ++) {
-    // writePixel(x+i, y, bitmap[j * w + i]);
-      // int16_t idx = x + y * 64;
-    memset(&_matrixbuff[y * 64 + xOffset], 0, (sizeof(uint16_t) * (64 - (xOffset * 2))));
-  }
+  /* case : all dot clear */
+  memset( _matrixbuff, 0, sizeof(uint16_t) * (64 * 32)); 
+  
+  /* case : border Excepet all clear */
+
+  // int xOffset = 0;
+  // int yOffset = 0;
+  // if (this->border_blink) {
+  //   // Serial.println("border_blink");
+  //   xOffset++;
+  //   yOffset++;
+  // }
+  // for (int y = (0 + yOffset); y < (32 - yOffset); y ++) {
+  //   // writePixel(x+i, y, bitmap[j * w + i]);
+  //     // int16_t idx = x + y * 64;
+  //   memset(&_matrixbuff[y * 64 + xOffset], 0, (sizeof(uint16_t) * (64 - (xOffset * 2))));
+  // }
 }
 
 #endif
