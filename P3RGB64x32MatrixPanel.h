@@ -71,7 +71,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
 
     bool doubleBuffer;
 
-    int timer_period = 70;
+    int timer_period = 30;
 
     static volatile SemaphoreHandle_t timerSemaphore;
     static P3RGB64x32MatrixPanel *singleton;
