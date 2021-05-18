@@ -15,6 +15,7 @@ void IRAM_ATTR P3RGB64x32MatrixPanel::onTimer() {
 
 void P3RGB64x32MatrixPanel::begin() {
   singleton = this;
+  matrixStatus = true;
 
   pinMode(pinR1, OUTPUT);
   pinMode(pinG1, OUTPUT);
@@ -45,6 +46,7 @@ void P3RGB64x32MatrixPanel::begin() {
 
 void P3RGB64x32MatrixPanel::stop() {
   if (timer) {
+    matrixStatus = false;
     timerDetachInterrupt(timer);
     timerEnd(timer);
   }
@@ -152,9 +154,10 @@ void IRAM_ATTR P3RGB64x32MatrixPanel::draw() {
 }
 
 void P3RGB64x32MatrixPanel::setDrawTimer(int timer) {
-  this->stop();
   this->timer_period = timer;
-  this->begin();
+}
 
+int P3RGB64x32MatrixPanel::getDrawTimer() {
+  return this->timer_period;
   // Serial.printf(" timer : %d \n", this->timer_period);
 }
