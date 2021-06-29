@@ -82,24 +82,23 @@ uint16_t P3RGB64x32MatrixPanel::colorHSV(long hue, uint8_t sat, uint8_t val) {
   return color555(r, g, b);
 }
 
-void P3RGB64x32MatrixPanel::drawPixelEx(int16_t x, int16_t y, uint16_t color) {
+void P3RGB64x32MatrixPanel::drawPixel(int16_t x, int16_t y, uint16_t color) {
   if (x < 0 || x >= 64 || y < 0  || y >= 32 ) return;
   int16_t idx = x + y * 64;
   drawBuffer()[idx] = color;
 }
 
-void P3RGB64x32MatrixPanel::drawPixel(int16_t x, int16_t y, uint16_t color) {
+void P3RGB64x32MatrixPanel::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) {
   int border_offSet = 0;
-  if (this->border_blink) {
-    border_offSet++;
-    // Serial.println("border_blink true");
-  }
+  
+  border_offSet += this->border_count;
+
   if (x < 0 + border_offSet || x >= 64 - border_offSet || y < 0 + border_offSet || y >= 32 - border_offSet) return;
   int16_t idx = x + y * 64;
   drawBuffer()[idx] = color;
 }
 
-void P3RGB64x32MatrixPanel::nonOverWriteDrawPixel(int16_t x, int16_t y, uint16_t color, uint8_t flag) { //  flag 0  = draw, flag 1 = clear
+void P3RGB64x32MatrixPanel::drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag) { //  flag 0  = draw, flag 1 = clear
   if (x < 0 || x >= 64 || y < 0  || y >= 32 ) return;
   int16_t idx = x + y * 64;
   if (drawBuffer()[idx] == 0 && flag == 0) {

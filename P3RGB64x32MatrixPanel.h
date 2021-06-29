@@ -18,7 +18,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     void begin(void);
     void stop(void);
     virtual void drawPixel(int16_t x, int16_t y, uint16_t color);   //  제한 없이 그림
-    virtual void drawPixelEx(int16_t x, int16_t y, uint16_t color); //  Flag 에 따라 제한적으로 그림
+    virtual void drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color); //  Flag 에 따라 제한적으로 그림
     uint16_t color444(uint8_t r, uint8_t g, uint8_t b) { return ((r & 0xf) << 1) | ((uint16_t)(g & 0xf) << 6) | ((uint16_t)(b & 0xf) << 11); }
 
     uint16_t color555(uint8_t r, uint8_t g, uint8_t b) { return (r&0x1f) | ((uint16_t)(g & 0x1f) << 5) | ((uint16_t)(b & 0x1f) << 10); }
@@ -29,7 +29,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     void clearMatrix();
     void setDrawTimer(int timer);
     int getDrawTimer();
-    void nonOverWriteDrawPixel(int16_t x, int16_t y, uint16_t color, uint8_t flag); //  사용중인 LED에 덮어쓰지 않음
+    void drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag); //  사용중인 LED에 덮어쓰지 않음
 
     bool ittrTimerCrashCheck();
 
