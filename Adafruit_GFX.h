@@ -26,7 +26,7 @@ class Adafruit_GFX : public Print {
   // These MAY be overridden by the subclass to provide device-specific
   // optimized code.  Otherwise 'generic' versions are used.
   virtual void startWrite(void);
-  virtual void drawPixelEx(int16_t x, int16_t y, uint16_t color);
+  virtual void drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color);
 
   virtual void writePixel(int16_t x, int16_t y, uint16_t color);
   virtual void writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
@@ -58,6 +58,9 @@ class Adafruit_GFX : public Print {
   void
     drawBitmapEx(int16_t xOffset, int16_t yOffset,
   uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),   
+
+      drawBitmapFillEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg), 
     
     drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
   uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),     
@@ -126,7 +129,7 @@ class Adafruit_GFX : public Print {
 
   // Serial UTF-8 decoder
   uint16_t decodeUTF8(uint8_t c);
-  boolean border_blink = false;
+  uint8_t border_count = 0;
 
 #if ARDUINO >= 100
   virtual size_t write(uint8_t);

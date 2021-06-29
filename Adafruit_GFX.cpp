@@ -130,9 +130,9 @@ void Adafruit_GFX::writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
 
     for (; x0<=x1; x0++) {
         if (steep) {
-            drawPixelEx(y0, x0, color);
+            drawPixel(y0, x0, color);
         } else {
-            drawPixelEx(x0, y0, color);
+            drawPixel(x0, y0, color);
         }
         err -= dy;
         if (err < 0) {
@@ -162,7 +162,7 @@ void Adafruit_GFX::writePixel(int16_t x, int16_t y, uint16_t color){
     drawPixel(x, y, color);
 }
 
-void Adafruit_GFX::drawPixelEx(int16_t x, int16_t y, uint16_t color){
+void Adafruit_GFX::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color){
 }
 
 
@@ -808,6 +808,52 @@ void Adafruit_GFX::drawBitmapEx(int16_t xOffset, int16_t yOffset,
                 // writePixel(x+i, y, (byte & 0x80) ? color : bg);
                 if(byte & 0x80) writePixel((x + i), y, color);
                 else if (bg != 0) writePixel((x + i), y, bg);
+            }
+        }
+    }
+    endWrite();
+}
+
+void Adafruit_GFX::drawBitmapFillEx(int16_t xOffset, int16_t yOffset,
+  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg) {
+
+    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+    uint8_t byte = 0;
+    int16_t x = 0, y = yOffset;
+
+    startWrite();
+    int16_t idx = 0;
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = xOffset - 7; i < w && idx <= 78; i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+idx - 7, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel(x+idx - 7, y, color);
+                else writePixel(x+idx - 7, y, bg);
+            }
+            idx = 0;
+        }
+    } else if(xOffset > 0) {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) && idx <= 64;i++, idx++) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel((x + i + xOffset), y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i + xOffset), y, color);
+                else writePixel(x+idx - 7, y, bg);
+            }
+            idx = 0;
+        }
+    } else {
+        for(int16_t j=0; j<h; j++, y++) {
+            for(int16_t i=0; i<w; i++ ) {
+                if(i & 7) byte <<= 1;
+                else      byte   = bitmap[j * byteWidth + i / 8];
+                // writePixel(x+i, y, (byte & 0x80) ? color : bg);
+                if(byte & 0x80) writePixel((x + i), y, color);
+                else writePixel(x+idx - 7, y, bg);
             }
         }
     }
