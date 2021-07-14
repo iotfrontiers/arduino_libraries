@@ -107,6 +107,16 @@ void P3RGB64x32MatrixPanel::drawPixelColorCheck(int16_t x, int16_t y, uint16_t c
     drawBuffer()[idx] = 0;
   }
 }
+
+void P3RGB64x32MatrixPanel::copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap) {
+  int idx = 0;    
+  for (int j= 0; j < h; j++) {
+    for (int i = 0; i < w; i++) {
+      _bitmap[idx++] = _matrixbuff[(j + y) * 64 + (i + x)];
+    }
+  }
+}
+
 void IRAM_ATTR P3RGB64x32MatrixPanel::draw() {
   static byte cnt = 30;
   static byte y = 15;
