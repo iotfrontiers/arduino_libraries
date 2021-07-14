@@ -68,7 +68,9 @@ class Adafruit_GFX : public Print {
   uint16_t *bitmap, int16_t w, int16_t h),   
     drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
   uint16_t *bitmap, int16_t w, int16_t h), 
-
+    drawRGBBitmapColor565(int16_t x, int16_t y, uint16_t *bitmap,
+  int16_t w, int16_t h),
+  
     drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
     drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,
       uint16_t color),

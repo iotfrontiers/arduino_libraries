@@ -1154,6 +1154,26 @@ void Adafruit_GFX::drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
     //        buffer[x + y * WIDTH] = color;
 }
 
+void Adafruit_GFX::drawRGBBitmapColor565(int16_t x, int16_t y,
+  uint16_t *bitmap, int16_t w, int16_t h) {
+    startWrite();
+    uint8_t r, g, b;
+    uint16_t _color;
+    for(int16_t j=0; j<h; j++, y++) {
+        for(int16_t i=0; i<w; i++ ) {
+            r = ((((bitmap[j * w + i] >> 11) & 0x1F) * 527) + 23) >> 6;
+            g = ((((bitmap[j * w + i] >> 5) & 0x3F) * 259) + 33) >> 6;
+            b = (((bitmap[j * w + i] & 0x1F) * 527) + 23) >> 6;
+            r /= 8;
+            g /= 8;
+            b /= 8;
+            _color = (r&0x1f) | ((uint16_t)(g & 0x1f) << 5) | ((uint16_t)(b & 0x1f) << 10);
+            writePixel(x+i, y, _color);
+        }
+    }
+    endWrite();
+}
+
 /**************************************************************************/
 /*!
    @brief   Draw a PROGMEM-resident 16-bit image (RGB 5/6/5) with a 1-bit mask (set bits = opaque, unset bits = clear) at the specified (x,y) position. BOTH buffers (color and mask) must be PROGMEM-resident. For 16-bit display devices; no color reduction performed.
