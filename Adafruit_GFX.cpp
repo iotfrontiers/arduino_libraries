@@ -780,7 +780,7 @@ void Adafruit_GFX::drawBitmapEx(int16_t xOffset, int16_t yOffset,
     if (xOffset < 0) {
         xOffset *= -1;
         for(int16_t j=0; j<h; j++, y++) {
-            for(int16_t i = xOffset - 7; i < w && idx <= 78; i++, idx++) {
+            for(int16_t i = xOffset - 7; i < w && idx <= _width + 14; i++, idx++) {
                 if(i & 7) byte <<= 1;
                 else      byte   = bitmap[j * byteWidth + i / 8];
                 // writePixel(x+idx - 7, y, (byte & 0x80) ? color : bg);
@@ -791,7 +791,7 @@ void Adafruit_GFX::drawBitmapEx(int16_t xOffset, int16_t yOffset,
         }
     } else if(xOffset > 0) {
         for(int16_t j=0; j<h; j++, y++) {
-            for(int16_t i = 0; i < (w - xOffset) && idx <= 64;i++, idx++) {
+            for(int16_t i = 0; i < (w - xOffset) && idx <= _width;i++, idx++) {
                 if(i & 7) byte <<= 1;
                 else      byte   = bitmap[j * byteWidth + i / 8];
                 // writePixel((x + i + xOffset), y, (byte & 0x80) ? color : bg);
@@ -875,7 +875,7 @@ void Adafruit_GFX::drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
     if (xOffset < 0) {
         xOffset *= -1;
         for(int16_t j=0; j<h; j++, y++) {
-            for(int16_t i = xOffset - 7; i < w && idx <= 78; i++, idx++) {
+            for(int16_t i = xOffset - 7; i < w && idx <= _width + 14; i++, idx++) {
                 if(i & 7) byte <<= 1;
                 else      byte   = bitmap[j * byteWidth + i / 8];
                 // writePixel(x+idx - 7, y, (byte & 0x80) ? color : bg);
@@ -886,7 +886,7 @@ void Adafruit_GFX::drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
         }
     } else if(xOffset > 0) {
         for(int16_t j=0; j<h; j++, y++) {
-            for(int16_t i = 0; i < (w - xOffset) && idx <= 64;i++, idx++) {
+            for(int16_t i = 0; i < (w - xOffset) && idx <= _width;i++, idx++) {
                 if(i & 7) byte <<= 1;
                 else      byte   = bitmap[j * byteWidth + i / 8];
                 // writePixel((x + i + xOffset), y, (byte & 0x80) ? color : bg);
