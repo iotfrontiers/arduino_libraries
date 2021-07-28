@@ -7,8 +7,12 @@
 
 class P3RGB64x32MatrixPanel : public Adafruit_GFX {
   public:
-    P3RGB64x32MatrixPanel(uint8_t _pinR1, uint8_t _pinG1, uint8_t _pinB1, uint8_t _pinR2, uint8_t _pinG2, uint8_t _pinB2, uint8_t _pinCLK, uint8_t _pinLAT, uint8_t _pinOE, uint8_t _pinA, uint8_t _pinB, uint8_t _pinC, uint8_t _pinD, bool _doubleBuffer = false)
-      : Adafruit_GFX(64, 32), pinR1(_pinR1), pinG1(_pinG1), pinB1(_pinB1), pinR2(_pinR2), pinG2(_pinG2), pinB2(_pinB2), pinCLK(_pinCLK), pinLAT(_pinLAT), pinOE(_pinOE), pinA(_pinA), pinB(_pinB), pinC(_pinC), pinD(_pinD), doubleBuffer(_doubleBuffer) {
+    P3RGB64x32MatrixPanel(uint8_t _pinR1, uint8_t _pinG1, uint8_t _pinB1, uint8_t _pinR2, uint8_t _pinG2, uint8_t _pinB2, uint8_t _pinCLK, uint8_t _pinLAT, uint8_t _pinOE, uint8_t _pinA, uint8_t _pinB, uint8_t _pinC, uint8_t _pinD, uint8_t _width, uint8_t _height, bool _doubleBuffer = false)
+      : Adafruit_GFX(_width, 32), pinR1(_pinR1), pinG1(_pinG1), pinB1(_pinB1), pinR2(_pinR2), pinG2(_pinG2), pinB2(_pinB2), pinCLK(_pinCLK), pinLAT(_pinLAT), pinOE(_pinOE), pinA(_pinA), pinB(_pinB), pinC(_pinC), pinD(_pinD), doubleBuffer(_doubleBuffer) {
+      this->panel_width  = _width;
+      this->panel_height = _height;
+
+      _matrixbuff = (uint16_t*) calloc (_width * _height, sizeof(uint16_t));
       initMatrixBuff();
     }
     P3RGB64x32MatrixPanel(bool _doubleBuffer = false)
@@ -39,7 +43,9 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     }
 
     uint16_t* matrixbuff;   //  Direct Matrix Buffer
-    uint16_t _matrixbuff[64*32];  //  Temp Matrix Buffer
+    uint16_t* _matrixbuff;  //  Temp Matrix Buffer
+
+    int16_t panel_width = 64, panel_height = 32;        ///< Display Pix Dot Size
 
     void copyBuffer() {
     }
@@ -97,7 +103,7 @@ inline uint16_t P3RGB64x32MatrixPanel::drawPixelRGB565(uint16_t color)
 
 inline void P3RGB64x32MatrixPanel::clearMatrix() {
   /* case : all dot clear */
-  memset( _matrixbuff, 0, sizeof(uint16_t) * (64 * 32)); 
+  memset( _matrixbuff, 0, sizeof(uint16_t) * (panel_width * 32)); 
 }
 
 inline bool P3RGB64x32MatrixPanel::ittrTimerCrashCheck() {
