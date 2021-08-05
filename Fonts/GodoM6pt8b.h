@@ -3204,7 +3204,7 @@ const uint8_t GodoM6pt8bBitmaps[] PROGMEM = {
    };
 // 1.Index, 2.W, 3.H, 4.xAdv, 5.dX, 6.dY
 const GFXglyph GodoM6pt8bGlyphs[] PROGMEM = { 
-  {0,   1,   1,   3,    0,   10 },   // 0x20 ' '
+  {0,   1,   1,   3,    0,   0 },   // 0x20 ' '
   {1,   1,   9,   3,    1,   1 },   // 0x21 '!'
   {3,   3,   3,   4,    0,   0 },   // 0x22 '"'
   {5,   7,   9,   7,    0,   1 },   // 0x23 '#'
