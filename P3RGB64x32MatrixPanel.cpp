@@ -3,15 +3,15 @@
 volatile SemaphoreHandle_t P3RGB64x32MatrixPanel::timerSemaphore;
 P3RGB64x32MatrixPanel* P3RGB64x32MatrixPanel ::singleton;
 
-void IRAM_ATTR P3RGB64x32MatrixPanel::onTimer() {
-  portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-  portENTER_CRITICAL_ISR(&timerMux);
+// void IRAM_ATTR P3RGB64x32MatrixPanel::onTimer() {
+//   portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+//   portENTER_CRITICAL_ISR(&timerMux);
 
-  singleton->draw();
+//   singleton->draw();
 
-  portEXIT_CRITICAL_ISR(&timerMux);
-  xSemaphoreGiveFromISR(timerSemaphore, NULL);
-}
+//   portEXIT_CRITICAL_ISR(&timerMux);
+//   xSemaphoreGiveFromISR(timerSemaphore, NULL);
+// }
 
 void P3RGB64x32MatrixPanel::begin() {
   singleton = this;
@@ -37,20 +37,19 @@ void P3RGB64x32MatrixPanel::begin() {
   digitalWrite(pinCLK, LOW);
   digitalWrite(pinOE, HIGH);
 
-  timerSemaphore = xSemaphoreCreateBinary();
-  timer = timerBegin(0, 80, true);
-  timerAttachInterrupt(timer, &onTimer, true);
-  timerAlarmWrite(timer,timer_period, true);
-  // timerAlarmWrite(timer,100, true);
+  // timerSemaphore = xSemaphoreCreateBinary();
+  // timer = timerBegin(0, 80, true);
+  // timerAttachInterrupt(timer, &onTimer, true);
+  // timerAlarmWrite(timer,timer_period, true);
 
-  timerAlarmEnable(timer);
+  // timerAlarmEnable(timer);
 }
 
 void P3RGB64x32MatrixPanel::stop() {
   if (timer) {
     matrixStatus = false;
-    timerDetachInterrupt(timer);
-    timerEnd(timer);
+    // timerDetachInterrupt(timer);
+    // timerEnd(timer);
   }
 }
 

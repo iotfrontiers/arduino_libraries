@@ -49,13 +49,13 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
 
     void copyBuffer() {
     }
+    void IRAM_ATTR draw();
 
   private:
     void initMatrixBuff() {
       matrixbuff = _matrixbuff;
     }
     static void IRAM_ATTR onTimer(void);
-    void IRAM_ATTR draw();
 
     uint16_t* drawBuffer() {
       if (!doubleBuffer) return _matrixbuff;
