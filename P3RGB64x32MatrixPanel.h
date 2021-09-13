@@ -31,11 +31,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     uint16_t colorHSV(long hue, uint8_t sat, uint8_t val);
 
     void clearMatrix();
-    void setDrawTimer(int timer);
-    int getDrawTimer();
     void drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag); //  사용중인 LED에 덮어쓰지 않음
-    
-    bool ittrTimerCrashCheck();
     void copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap);
     
     void swapBuffer() {
@@ -104,11 +100,6 @@ inline uint16_t P3RGB64x32MatrixPanel::drawPixelRGB565(uint16_t color)
 inline void P3RGB64x32MatrixPanel::clearMatrix() {
   /* case : all dot clear */
   memset( _matrixbuff, 0, sizeof(uint16_t) * (panel_width * 32)); 
-}
-
-inline bool P3RGB64x32MatrixPanel::ittrTimerCrashCheck() {
-  if (matrixStatus == false || timer_period < 40)  return true;
-  else  return false;
 }
 
 #endif
