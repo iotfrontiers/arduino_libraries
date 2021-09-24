@@ -306,6 +306,7 @@ XT_DAC_Audio_Class::XT_DAC_Audio_Class(uint8_t TheDacPin, uint8_t TimerNo,uint16
 	// that we will call our onTimer function 50,000 times a second
 
 	// reserve some memory for the buffer
+
 	Buffer=new uint8_t[PassedBufferSize];
 	BufferSize=PassedBufferSize;					// Buffer Size is global var used in other routines that need to know size
 	for(uint32_t i=0;i<PassedBufferSize;i++)		// Set all bytes in buffer to 0x7f (DAC silence), TEB Sep-23-2019
@@ -317,15 +318,25 @@ XT_DAC_Audio_Class::XT_DAC_Audio_Class(uint8_t TheDacPin, uint8_t TimerNo,uint16
 	InitSineValues();								// create our table of sine values for our special circular
 													// angles of 0 - 255 "DAC Degrees". Speeds things up to if
 													// you pre-calculate
+                    								// Allow system to settle, otherwise garbage can play for first second
+}
+
+void XT_DAC_Audio_Class::beginTimer() {
 	// Set up interrupt routine
-	timer = timerBegin(TimerNo, 80, true);          // use timer TimerNo, pre-scaler is 80 (divide by 8000), count up
+	timer = timerBegin(1, 80, true);          // use timer TimerNo, pre-scaler is 80 (divide by 8000), count up
 	timerAttachInterrupt(timer, &onTimer, true);    // P3= edge triggered
 	timerAlarmWrite(timer, 20, true);               // will trigger 250,000 times per second,
 	timerAlarmEnable(timer);                        // enable
-	delay(1);                             			// Allow system to settle, otherwise garbage can play for first second
-
+	delay(1);         
 }
 
+void XT_DAC_Audio_Class::stopTimer() {
+  if (timer) {
+    timerAlarmDisable(timer);
+    timerDetachInterrupt(timer);
+    timerEnd(timer);
+  }       
+}
 
 void XT_DAC_Audio_Class::PrintPlayList()
 {

@@ -18,6 +18,8 @@
 
 #pragma once
 #include "MusicDefinitions.h"
+#include <stdint.h>
+
 
 #define BUFFER_SIZE_DEFAULT 4000 			    // Size of buffer to store data to send to DAC. 3 bytes minimum!
 												// 4000 bytes (Default) should allow for very slow main loops
@@ -447,10 +449,10 @@ class XT_DAC_Audio_Class
 		bool AlreadyPlaying(XT_PlayListItem_Class *Item);
 		void RemoveFromPlayList(XT_PlayListItem_Class *ItemToRemove);
 		int BufferUsage();
+		void beginTimer();
+		void stopTimer();
 
 		// debug
 		void PrintPlayList();
-
-
 };
 
