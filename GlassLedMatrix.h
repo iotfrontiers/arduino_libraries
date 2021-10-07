@@ -1,13 +1,13 @@
-#ifndef _TRANSPARENT_MATRIX_
-#define _TRANSPARENT_MATRIX_
+#ifndef _GLASS_LED_MATRIX_
+#define _GLASS_LED_MATRIX_
 
 #include <vector>
 #include <array>
 #include "Adafruit_GFX.h"
 
-class TransparentMatrix : public Adafruit_GFX {
+class GlassLedMatrix : public Adafruit_GFX {
   public:
-    TransparentMatrix(uint8_t _pin, uint16_t _width, uint16_t _height) //  생성자 -- 핀 번호, 디스플레이 넓이, 디스플레이 높이 세팅 
+    GlassLedMatrix(uint8_t _pin, uint16_t _width, uint16_t _height) //  생성자 -- 핀 번호, 디스플레이 넓이, 디스플레이 높이 세팅 
       : Adafruit_GFX(_width, _height) {
 
       matrix = (uint8_t*) calloc (_width * _height, sizeof(uint8_t)); //  높이 * 넓이 만큼 매트릭스 버퍼 동적 할당

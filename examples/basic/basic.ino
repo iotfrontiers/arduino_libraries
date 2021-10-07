@@ -7,7 +7,7 @@
 // Adafruit NeoPixel library
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include <TransparentMatrix.h>
+#include <GlassLedMatrix.h>
 #include <Fonts/GodoM6pt8b.h>
 
 #ifdef __AVR__
@@ -17,7 +17,7 @@
 #define WIDTH 24
 #define HEIGHT 12
 
-TransparentMatrix matrix(25, WIDTH, HEIGHT); //  pin, width, height
+GlassLedMatrix matrix(25, WIDTH, HEIGHT); //  pin, width, height
 
 void setup() {
   Serial.begin(115200);
