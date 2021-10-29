@@ -139,7 +139,7 @@ class Adafruit_GFX : public Print {
   virtual void   write(uint8_t);
 #endif
 
-  virtual size_t write(uint8_t, uint16_t, bool);
+  virtual size_t write(uint8_t, uint16_t);
   int16_t height(void) const;
   int16_t width(void) const;
 

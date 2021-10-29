@@ -1409,7 +1409,7 @@ uint16_t Adafruit_GFX::decodeUTF8(uint8_t c)
     @param  utf8  The 8-bit UTF-8 or ASCII code
 */
 /**************************************************************************/
-size_t Adafruit_GFX::write(uint8_t data, uint16_t _textColor, bool isColorText) {
+size_t Adafruit_GFX::write(uint8_t data, uint16_t _textColor) {
     // Serial.printf("_textColor : %d \n", _textColor);
     uint16_t c = (uint16_t)data;
     textcolor = _textColor;
