@@ -28,11 +28,11 @@ void GlassLedMatrix::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) 
   if (x < 0 + border_offSet || x >= panel_width - border_offSet || y < 0 + border_offSet || y >= panel_height - border_offSet) return;
   int16_t idx =(x * panel_height) + y;
   matrix[idx] = (uint8_t)color;
+  isDraw = true;
 }
 
 void GlassLedMatrix::show() {
   espShow(pin, matrix, _width * panel_height, false);
-
 }
 
 void GlassLedMatrix::drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag) { //  flag 0  = draw, flag 1 = clear
@@ -46,6 +46,7 @@ void GlassLedMatrix::drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, u
   } else if (matrix[idx] == color && flag == 1) {
     matrix[idx] = 0;
   }
+  isDraw = true;
 }
 
 void GlassLedMatrix::copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap) {

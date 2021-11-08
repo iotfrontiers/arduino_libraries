@@ -61,6 +61,7 @@ inline uint8_t GlassLedMatrix::drawPixelRGB565(uint16_t color)
 inline void GlassLedMatrix::clearMatrix() {
   /* case : all dot clear */
   memset(matrix, 0, sizeof(uint8_t) * (panel_width * panel_height));
+  isDraw = true;
 }
 
 #endif
