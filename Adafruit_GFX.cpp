@@ -1428,7 +1428,7 @@ size_t Adafruit_GFX::write(uint8_t data, uint16_t _textColor) {
                 cursor_x  = 0;                 // Reset x to zero,
                 cursor_y += textsize * 8;      // advance y one line
             }
-            drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+            drawChar(cursor_x, cursor_y, c, textcolor, 0, textsize);
             cursor_x += textsize * 6;          // Advance x one char
         }
 
