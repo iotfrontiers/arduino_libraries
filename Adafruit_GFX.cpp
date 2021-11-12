@@ -1108,7 +1108,7 @@ void Adafruit_GFX::drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
         xOffset *= -1;
         for(int16_t j = 0; j < h; j++, y++) {
             for(int16_t i= xOffset; i<w; i++, idx++) {
-                if ((bitmap[j * w + i]) != 0)   writePixel(x+idx, y, bitmap[j * w + i]);
+                if ((bitmap[j * w + i]) != 0)   drawPixelBorderCheck(x+idx, y, bitmap[j * w + i]);
             }
             idx = 0;
         }
@@ -1116,7 +1116,7 @@ void Adafruit_GFX::drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
     } else {     // y = j, i = w
         for(int16_t j = 0; j < h; j++, y++) {
             for(int16_t i = 0; i < (w - xOffset) ; i++) {
-                if ((bitmap[j * w + i]) != 0)   writePixel((x+i+xOffset), y, bitmap[j * w + i]);
+                if ((bitmap[j * w + i]) != 0)   drawPixelBorderCheck((x+i+xOffset), y, bitmap[j * w + i]);
             }
         }
         // Serial.printf("양수 after xOffset : %d \n", xOffset);
@@ -1137,7 +1137,7 @@ void Adafruit_GFX::drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
         xOffset *= -1;
         for(int16_t j = 0; j < h; j++, y++) {
             for(int16_t i= xOffset; i<w; i++, idx++) {
-                if ((bitmap[j * w + i]) != 0) writePixel(x+idx, y, 0);
+                if ((bitmap[j * w + i]) != 0) drawPixelBorderCheck(x+idx, y, 0);
             }
             idx = 0;
         }
@@ -1145,7 +1145,7 @@ void Adafruit_GFX::drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,
     } else {     // y = j, i = w
         for(int16_t j = 0; j < h; j++, y++) {
             for(int16_t i = 0; i < (w - xOffset) ; i++) {
-                if ((bitmap[j * w + i]) != 0) writePixel((x+i+xOffset), y, 0);
+                if ((bitmap[j * w + i]) != 0) drawPixelBorderCheck((x+i+xOffset), y, 0);
             }
         }
         // Serial.printf("양수 after xOffset : %d \n", xOffset);
