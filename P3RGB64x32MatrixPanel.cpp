@@ -40,7 +40,7 @@ void P3RGB64x32MatrixPanel::begin() {
   timerSemaphore = xSemaphoreCreateBinary();
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
-  timerAlarmWrite(timer,100, true);
+  timerAlarmWrite(timer,70, true);
   timerAlarmEnable(timer);
 }
 
