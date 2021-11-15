@@ -39,6 +39,9 @@ class GlassLedMatrix : public Adafruit_GFX {
     int16_t panel_width = 24, panel_height = 12;        ///< 디스플레이 도트 사이즈
     uint8_t pin = 14;                                   ///< 데이터 핀
 
+    uint8_t hue_color = 0;
+    bool is_color_wheel = false;
+
     void draw();
 
   private:
