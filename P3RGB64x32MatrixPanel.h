@@ -42,6 +42,8 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
     uint16_t* _matrixbuff;  //  Temp Matrix Buffer
 
     int16_t panel_width = 64, panel_height = 32;        ///< Display Pix Dot Size
+    uint8_t hue_color = 0;
+    bool is_color_wheel = false;
 
     void copyBuffer() {
     }
@@ -79,6 +81,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
 
     int timer_period = 30;
     bool matrixStatus = false;
+
     
     static volatile SemaphoreHandle_t timerSemaphore;
     static P3RGB64x32MatrixPanel *singleton;

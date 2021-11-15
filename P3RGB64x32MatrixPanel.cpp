@@ -94,6 +94,27 @@ void P3RGB64x32MatrixPanel::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t 
   border_offSet += this->border_count;
 
   if (x < 0 + border_offSet || x >= panel_width - border_offSet || y < 0 + border_offSet || y >= panel_height - border_offSet) return;
+
+  if (is_color_wheel) {
+    if (color != 0) {
+      uint8_t r, g, b;
+
+      r = color & 0x1f;
+      g = 0x1f & (color >> 5);
+      b = 0x1f & (color >> 10);
+
+      r += hue_color + 0;
+      g += hue_color + 10;
+      b += hue_color + 20;
+
+      r = r % 31;
+      g = g % 31;
+      b = b % 31;
+
+      color = color555(r,g,b);
+    }
+  }
+
   int16_t idx = x + y * panel_width;
   drawBuffer()[idx] = color;
 }
