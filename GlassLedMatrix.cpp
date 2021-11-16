@@ -12,6 +12,7 @@ void GlassLedMatrix::stop() {
 
 void GlassLedMatrix::drawPixel(int16_t x, int16_t y, uint16_t color) {
   if (x >= panel_width || y >= panel_height) return;
+  if (color == 0) return;
   int postion = (x * panel_height) + y;
 
   matrix[postion] = (uint8_t)singleColorFixValue;
@@ -19,6 +20,8 @@ void GlassLedMatrix::drawPixel(int16_t x, int16_t y, uint16_t color) {
 }
 
 void GlassLedMatrix::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) {
+  if (color == 0) return;
+
   int border_offSet = 0;
   
   border_offSet += this->border_count;
@@ -35,9 +38,10 @@ void GlassLedMatrix::show() {
 
 void GlassLedMatrix::drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag) { //  flag 0  = draw, flag 1 = clear
   if (x < 0 || x >= panel_width || y < 0  || y >= panel_height ) return;
+  if (color == 0) return;
+
   // int16_t idx = x + y * panel_width;
   int16_t idx = (x * panel_height) + y;
-
 
   if (matrix[idx] == 0 && flag == 0) {
     matrix[idx] = color;
