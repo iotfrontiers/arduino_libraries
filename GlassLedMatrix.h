@@ -32,6 +32,7 @@ class GlassLedMatrix : public Adafruit_GFX {
     uint16_t colorHSV(long hue, uint8_t sat, uint8_t val){ return 15;};
 
     void clearMatrix();
+    void setLedLevel(float _led_level);
     void drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, uint8_t flag); //  사용중인 LED에 덮어쓰지 않음
     void copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap);
     
@@ -40,6 +41,7 @@ class GlassLedMatrix : public Adafruit_GFX {
     uint8_t pin = 14;                                   ///< 데이터 핀
 
     uint8_t hue_color = 0;
+    uint8_t singleColorFixValue = 255;  //  컬러 밝기 레벨 0~255
     bool is_color_wheel = false;
 
     void draw();
@@ -65,6 +67,14 @@ inline void GlassLedMatrix::clearMatrix() {
   /* case : all dot clear */
   memset(matrix, 0, sizeof(uint8_t) * (panel_width * panel_height));
   isDraw = true;
+}
+
+/**
+ * 단일 색상 GLASS LED 
+ * 어플 발기 단계 값에 따른 255 * 소수값 계산하여 밝기 조절
+ */
+inline void GlassLedMatrix::setLedLevel(float _led_level) {
+  singleColorFixValue = 255 * _led_level * _led_level;
 }
 
 #endif
