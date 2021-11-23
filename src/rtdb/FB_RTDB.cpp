@@ -817,14 +817,14 @@ void FB_RTDB::runStreamTask()
             }
 
             yield();
-            vTaskDelay(3 / portTICK_PERIOD_MS);
+            vTaskDelay(2000);
         }
 
         Signer.getCfg()->_int.fb_sdo[id].get()._ss.rtdb.stream_task_handle = NULL;
         vTaskDelete(NULL);
     };
 
-    xTaskCreatePinnedToCore(taskCode, taskName, fbdo->_ss.rtdb.stream_task_stack_size, NULL, 3, &fbdo->_ss.rtdb.stream_task_handle, 1);
+    xTaskCreatePinnedToCore(taskCode, taskName, fbdo->_ss.rtdb.stream_task_stack_size, NULL, 3, &fbdo->_ss.rtdb.stream_task_handle, 0);
 
 #elif defined(ESP8266)
 
