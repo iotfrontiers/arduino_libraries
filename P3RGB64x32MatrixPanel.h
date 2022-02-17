@@ -11,6 +11,8 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
       : Adafruit_GFX(_width, 32), pinR1(_pinR1), pinG1(_pinG1), pinB1(_pinB1), pinR2(_pinR2), pinG2(_pinG2), pinB2(_pinB2), pinCLK(_pinCLK), pinLAT(_pinLAT), pinOE(_pinOE), pinA(_pinA), pinB(_pinB), pinC(_pinC), pinD(_pinD), doubleBuffer(_doubleBuffer) {
       this->panel_width  = _width;
       this->panel_height = _height;
+      
+      if (_width > 64 ) timer_period = 120; // 매트릭스 Width Size 64보다 크면 Timer 주기 120으로 설정
 
       _matrixbuff = (uint16_t*) calloc (_width * _height, sizeof(uint16_t));
       initMatrixBuff();
@@ -79,7 +81,7 @@ class P3RGB64x32MatrixPanel : public Adafruit_GFX {
 
     bool doubleBuffer;
 
-    int timer_period = 30;
+    int timer_period = 70;
     bool matrixStatus = false;
 
     
