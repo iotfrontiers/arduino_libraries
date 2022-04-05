@@ -182,6 +182,9 @@ class Adafruit_GFX : public Print {
   uint8_t  decoderState = 0;   // UTF-8 decoder state
   uint16_t decoderBuffer;      // Unicode code-point buffer
 
+  public:
+    uint8_t 
+    canvas_rotation = 0;       ///< 캔버스 로테이션 값
 };
 
 

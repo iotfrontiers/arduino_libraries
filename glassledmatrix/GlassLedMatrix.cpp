@@ -13,7 +13,12 @@ void GlassLedMatrix::stop() {
 void GlassLedMatrix::drawPixel(int16_t x, int16_t y, uint16_t color) {
   if (x >= panel_width || y >= panel_height) return;
   if (color != 0) color = singleColorFixValue;
-  x = panel_width - 1 - x;
+
+  if (this->canvas_rotation == 0)
+    x = panel_width - 1 - x;
+  else 
+    y = panel_height - 1 - y;
+
   int postion = (x * panel_height) + y;
 
   matrix[postion] = (uint8_t)color;
@@ -29,7 +34,11 @@ void GlassLedMatrix::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) 
 
   if (x < 0 + border_offSet || x >= panel_width - border_offSet || y < 0 + border_offSet || y >= panel_height - border_offSet) return;
 
-  x = panel_width - 1 - x;
+  if (this->canvas_rotation == 0)
+    x = panel_width - 1 - x;
+  else 
+    y = panel_height - 1 - y;
+
   int16_t idx =(x * panel_height) + y;
   matrix[idx] = (uint8_t)color;
   isDraw = true;
@@ -44,7 +53,12 @@ void GlassLedMatrix::drawPixelColorCheck(int16_t x, int16_t y, uint16_t color, u
   if (color != 0) color = singleColorFixValue;
 
   // int16_t idx = x + y * panel_width;
-  x = panel_width - 1 - x;
+
+  if (this->canvas_rotation == 0)
+    x = panel_width - 1 - x;
+  else 
+    y = panel_height - 1 - y;
+
   int16_t idx = (x * panel_height) + y;
 
   if (matrix[idx] == 0 && flag == 0) {
@@ -59,7 +73,11 @@ void GlassLedMatrix::copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t 
   if (x >= _width || y >= panel_height) return;
 
 
-  x = panel_width - 1 - x;
+  if (this->canvas_rotation == 0)
+    x = panel_width - 1 - x;
+  else 
+    y = panel_height - 1 - y;
+
   int idx = 0;    
   for (int j= 0; j < h; j++) {
     for (int i = 0; i < w; i++) {
