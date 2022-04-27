@@ -62,48 +62,21 @@
  #define CHAIN_LENGTH                1   // Number of modules chained together, i.e. 4 panels chained result in virtualmatrix 64x4=256 px long
 #endif
 
-/* ESP32 Default Pin definition. You can change this, but best if you keep it as is and provide custom pin mappings 
- * as part of the begin(...) function.
- */
-// Default pin mapping for ESP32-S2 and ESP32-S3
-#ifdef ESP32_SXXX 
- 
-    #define R1_PIN_DEFAULT 45
-    #define G1_PIN_DEFAULT 42
-    #define B1_PIN_DEFAULT 41
-    #define R2_PIN_DEFAULT 40
-    #define G2_PIN_DEFAULT 39
-    #define B2_PIN_DEFAULT 38
-    #define A_PIN_DEFAULT  37
-    #define B_PIN_DEFAULT  36
-    #define C_PIN_DEFAULT  35
-    #define D_PIN_DEFAULT  34
-    #define E_PIN_DEFAULT  -1 // required for 1/32 scan panels, like 64x64. Any available pin would do, i.e. IO32
-    #define LAT_PIN_DEFAULT 26
-    #define OE_PIN_DEFAULT  21
-    #define CLK_PIN_DEFAULT 33
-
-// Else use default pin mapping for ESP32 Original WROOM module.
-#else 
-     
-    #define R1_PIN_DEFAULT  25
-    #define G1_PIN_DEFAULT  26
-    #define B1_PIN_DEFAULT  27
-    #define R2_PIN_DEFAULT  14
-    #define G2_PIN_DEFAULT  12
-    #define B2_PIN_DEFAULT  13
-
-    #define A_PIN_DEFAULT   23
-    #define B_PIN_DEFAULT   19
-    #define C_PIN_DEFAULT   5
-    #define D_PIN_DEFAULT   17
-    #define E_PIN_DEFAULT   -1 // IMPORTANT: Change to a valid pin if using a 64x64px panel.
-              
-    #define LAT_PIN_DEFAULT 4
-    #define OE_PIN_DEFAULT  15
-    #define CLK_PIN_DEFAULT 16
+#define R1_PIN_DEFAULT  25
+  #define G1_PIN_DEFAULT  26
+  #define B1_PIN_DEFAULT  27
+  #define R2_PIN_DEFAULT  21
+  #define G2_PIN_DEFAULT  22
+  #define B2_PIN_DEFAULT  0
+  #define A_PIN_DEFAULT   12
+  #define B_PIN_DEFAULT   5
+  #define C_PIN_DEFAULT   23
+  #define D_PIN_DEFAULT   4
+  #define E_PIN_DEFAULT   -1 // IMPORTANT: Change to a valid pin if using a 64x64px panel.
+  #define LAT_PIN_DEFAULT 32
+  #define OE_PIN_DEFAULT  33
+  #define CLK_PIN_DEFAULT 15
     
-#endif  
 
 // Interesting Fact: We end up using a uint16_t to send data in parallel to the HUB75... but 
 //                   given we only map to 14 physical output wires/bits, we waste 2 bits.
@@ -444,6 +417,8 @@ class MatrixPanel_I2S_DMA {
 
     // Adafruit's BASIC DRAW API (565 colour format)
     virtual void drawPixel(int16_t x, int16_t y, uint16_t color);   // overwrite adafruit implementation
+    virtual void drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color);   // overwrite adafruit implementation
+
     virtual void fillScreen(uint16_t color);                        // overwrite adafruit implementation
 
     /**
@@ -741,6 +716,14 @@ inline void MatrixPanel_I2S_DMA::color565to888(const uint16_t color, uint8_t &r,
 }
 
 inline void MatrixPanel_I2S_DMA::drawPixel(int16_t x, int16_t y, uint16_t color) // adafruit virtual void override
+{
+  uint8_t r,g,b;
+  color565to888(color,r,g,b);
+  
+  updateMatrixDMABuffer( x, y, r, g, b);
+} 
+
+inline void MatrixPanel_I2S_DMA::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) // adafruit virtual void override
 {
   uint8_t r,g,b;
   color565to888(color,r,g,b);
