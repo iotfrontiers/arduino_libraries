@@ -451,7 +451,8 @@ class XT_DAC_Audio_Class
 		int BufferUsage();
 		void beginTimer();
 		void stopTimer();
-
+		bool isTimerRunning = false;
+		
 		// debug
 		void PrintPlayList();
 };

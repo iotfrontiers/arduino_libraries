@@ -24,8 +24,7 @@
 #include "XT_DAC_Audio.h"
 #include "HardwareSerial.h"
 #include "soc/sens_reg.h"  // For dacWrite() patch, TEB Sep-16-2019
-
-
+#include "soc/rtc_io_reg.h"  // For dacWrite() patch, TEB Sep-16-2019
 
 /*  Every variable that is used in the mainline code and in the onTImer interrupt code
  *	must be declared volatile.
@@ -129,10 +128,6 @@ uint8_t SetVolume(uint8_t Value,uint8_t Volume)
 	return 0x7f-AdjustedValue;
 
 }
-
-
-
-
 
 // The main interrupt routine called "BytesPerSec" times per second (132300 BPS).
 // WARNING: Do not use Arduino function dacWrite() in this isr. It will cause
@@ -253,6 +248,7 @@ void XT_DAC_Audio_Class::FillBuffer()
 		NextPlayItem=PlayItem->NextItem;							// move to next play item
 		if(PlayItem->Playing==false)								// If this play item completed
 		{
+			stopTimer();
 			if(PlayItem->RepeatForever)
 			{
 				PlayItem->Init();						// initialise for playing again
@@ -323,19 +319,23 @@ XT_DAC_Audio_Class::XT_DAC_Audio_Class(uint8_t TheDacPin, uint8_t TimerNo,uint16
 
 void XT_DAC_Audio_Class::beginTimer() {
 	// Set up interrupt routine
-	timer = timerBegin(1, 80, true);          // use timer TimerNo, pre-scaler is 80 (divide by 8000), count up
-	timerAttachInterrupt(timer, &onTimer, true);    // P3= edge triggered
-	timerAlarmWrite(timer, 20, true);               // will trigger 250,000 times per second,
-	timerAlarmEnable(timer);                        // enable
-	delay(1);         
+	if (isTimerRunning == false) {
+		timer = timerBegin(1, 80, true);          // use timer TimerNo, pre-scaler is 80 (divide by 8000), count up
+		timerAttachInterrupt(timer, &onTimer, true);    // P3= edge triggered
+		timerAlarmWrite(timer, 20, true);               // will trigger 250,000 times per second,
+		timerAlarmEnable(timer);                        // enable
+		delay(1);
+	}     
+	isTimerRunning = true;
 }
 
 void XT_DAC_Audio_Class::stopTimer() {
-  if (timer) {
+  if (timer && isTimerRunning == true) {
     timerAlarmDisable(timer);
     timerDetachInterrupt(timer);
     timerEnd(timer);
-  }       
+  }
+  isTimerRunning = false;
 }
 
 void XT_DAC_Audio_Class::PrintPlayList()
@@ -970,8 +970,9 @@ uint8_t XT_Envelope_Class::NextByte(uint8_t ByteToPlay)
 				{
 					if(RepeatCounter>0)
 						RepeatCounter--;
-					else
+					else {
 						EnvelopeCompleted=true;
+					}
 				}
 				else
 					InitEnvelopePart(CurrentEnvelopePart,CurrentVolume);
