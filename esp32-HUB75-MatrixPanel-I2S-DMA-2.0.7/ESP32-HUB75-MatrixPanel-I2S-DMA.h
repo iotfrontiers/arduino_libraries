@@ -351,6 +351,8 @@ class MatrixPanel_I2S_DMA {
         
       if (initialized) return true; // we don't do this twice or more!
 
+      _matrixbuff = (uint16_t*) ps_calloc (m_cfg.mx_width * m_cfg.mx_height, sizeof(uint16_t));
+
       // Change 'if' to '1' to enable, 0 to not include this Serial output in compiled program        
       #if SERIAL_DEBUG       
             Serial.printf_P(PSTR("Using pin %d for the R1_PIN\n"), m_cfg.gpio.r1);
@@ -417,6 +419,7 @@ class MatrixPanel_I2S_DMA {
 
     // Adafruit's BASIC DRAW API (565 colour format)
     virtual void drawPixel(int16_t x, int16_t y, uint16_t color);   // overwrite adafruit implementation
+    virtual void drawPixelBackground(int16_t x, int16_t y, uint16_t color);   // 배경에 draw 하기 위해 temp buffer에 기록하지 않음
     virtual void drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color);   // overwrite adafruit implementation
 
     virtual void fillScreen(uint16_t color);                        // overwrite adafruit implementation
@@ -424,7 +427,7 @@ class MatrixPanel_I2S_DMA {
     /**
      * A wrapper to fill whatever selected DMA buffer / screen with black
      */
-    inline void clearScreen(){ updateMatrixDMABuffer(0,0,0); };
+    inline void clearScreen(){ updateMatrixDMABuffer(0,0,0, 0); };
 
 #ifndef NO_FAST_FUNCTIONS
     /**
@@ -572,6 +575,24 @@ class MatrixPanel_I2S_DMA {
     } 
     
 
+  //  ---------  사용자 정의 변수 및 함수-------
+
+//  color wheel action boolean value
+  bool is_color_wheel = false;  
+
+  // 해당 사각형 영역 bitmap copy
+  void copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap);
+
+  //  color HSV to color 565
+  uint16_t colorHSV(long hue, uint8_t sat, uint8_t val);
+  
+  void printEx();
+
+  //  hue_color temp value
+  uint8_t hue_color = 0;
+
+  uint16_t* _matrixbuff;  //  Temp Matrix Buffer
+
 
   // ------- PROTECTED -------
   // those might be useful for child classes, like VirtualMatrixPanel
@@ -588,10 +609,10 @@ class MatrixPanel_I2S_DMA {
     void clearFrameBuffer(bool _buff_id = 0);
 
     /* Update a specific pixel in the DMA buffer to a colour */
-    void updateMatrixDMABuffer(int16_t x, int16_t y, uint8_t red, uint8_t green, uint8_t blue);
+    void updateMatrixDMABuffer(int16_t x, int16_t y, uint8_t red, uint8_t green, uint8_t blue, uint16_t _color, bool _isSave = true);
    
     /* Update the entire DMA buffer (aka. The RGB Panel) a certain colour (wipe the screen basically) */
-    void updateMatrixDMABuffer(uint8_t red, uint8_t green, uint8_t blue);       
+    void updateMatrixDMABuffer(uint8_t red, uint8_t green, uint8_t blue, uint16_t _color);
 
     /**
      * wipes DMA buffer(s) and reset all color/service bits
@@ -720,15 +741,30 @@ inline void MatrixPanel_I2S_DMA::drawPixel(int16_t x, int16_t y, uint16_t color)
   uint8_t r,g,b;
   color565to888(color,r,g,b);
   
-  updateMatrixDMABuffer( x, y, r, g, b);
+  updateMatrixDMABuffer( x, y, r, g, b, color);
 } 
 
-inline void MatrixPanel_I2S_DMA::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) // adafruit virtual void override
+inline void MatrixPanel_I2S_DMA::drawPixelBackground(int16_t x, int16_t y, uint16_t color) // adafruit virtual void override
 {
   uint8_t r,g,b;
   color565to888(color,r,g,b);
   
-  updateMatrixDMABuffer( x, y, r, g, b);
+  updateMatrixDMABuffer( x, y, r, g, b, color, false);
+} 
+
+inline void MatrixPanel_I2S_DMA::drawPixelBorderCheck(int16_t x, int16_t y, uint16_t color) // adafruit virtual void override
+{
+  int border_offSet = 0;
+  
+  border_offSet += this->border_count;  //  현재 border count
+
+  if (x < 0 + border_offSet || x >= this->m_cfg.mx_width - border_offSet || y < 0 + border_offSet || y >= this->m_cfg.mx_height - border_offSet) return;  //  테두리 영역인 경우 return;
+  // Serial.printf("this->m_cfg.mx_width : %d \n", this->m_cfg.mx_width);
+
+  uint8_t r,g,b;
+  color565to888(color,r,g,b);
+  
+  updateMatrixDMABuffer( x, y, r, g, b, color);
 } 
 
 inline void MatrixPanel_I2S_DMA::fillScreen(uint16_t color)  // adafruit virtual void override
@@ -736,17 +772,17 @@ inline void MatrixPanel_I2S_DMA::fillScreen(uint16_t color)  // adafruit virtual
   uint8_t r,g,b;
   color565to888(color,r,g,b);
   
-  updateMatrixDMABuffer(r, g, b); // RGB only (no pixel coordinate) version of 'updateMatrixDMABuffer'
+  updateMatrixDMABuffer(r, g, b, color); // RGB only (no pixel coordinate) version of 'updateMatrixDMABuffer'
 } 
 
 inline void MatrixPanel_I2S_DMA::drawPixelRGB888(int16_t x, int16_t y, uint8_t r, uint8_t g,uint8_t b) 
 {
-  updateMatrixDMABuffer( x, y, r, g, b);
+  updateMatrixDMABuffer( x, y, r, g, b, color565(r,g,b));
 }
 
 inline void MatrixPanel_I2S_DMA::fillScreenRGB888(uint8_t r, uint8_t g,uint8_t b)
 {
-  updateMatrixDMABuffer(r, g, b); // RGB only (no pixel coordinate) version of 'updateMatrixDMABuffer'
+  updateMatrixDMABuffer(r, g, b, color565(r,g,b)); // RGB only (no pixel coordinate) version of 'updateMatrixDMABuffer'
 } 
 
 #ifdef USE_GFX_ROOT

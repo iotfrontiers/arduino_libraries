@@ -460,7 +460,7 @@ void MatrixPanel_I2S_DMA::configureDMA(const HUB75_I2S_CFG& _cfg)
  *  and had to be read from spi-flash over and over again.
  *  Yes, it is always a tradeoff between memory/speed/size, but compared to DMA-buffer size is not a big deal
  */
-void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16_t y_coord, uint8_t red, uint8_t green, uint8_t blue)
+void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16_t y_coord, uint8_t red, uint8_t green, uint8_t blue, uint16_t _color, bool _isSave) 
 {
     if ( !initialized ) { 
       #if SERIAL_DEBUG 
@@ -474,6 +474,11 @@ void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16
   */
   if ( x_coord < 0 || y_coord < 0 || x_coord >= PIXELS_PER_ROW || y_coord >= m_cfg.mx_height) {
     return;
+  }
+
+  if (_isSave) {
+    int16_t _idx = x_coord + y_coord * m_cfg.mx_width;
+    _matrixbuff[_idx] = _color;
   }
 
   /* LED Brightness Compensation. Because if we do a basic "red & mask" for example, 
@@ -517,6 +522,9 @@ void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16
 
     // Iterating through colour depth bits, which we assume are 8 bits per RGB subpixel (24bpp)
     uint8_t color_depth_idx = PIXEL_COLOR_DEPTH_BITS;
+
+    int idx = 0;
+
     do {
         --color_depth_idx;
 //        uint8_t mask = (1 << (color_depth_idx COLOR_DEPTH_LESS_THAN_8BIT_ADJUST)); // expect 24 bit color (8 bits per RGB subpixel)
@@ -541,7 +549,6 @@ void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16
         // it would represent a vector pointing to the full row of pixels for the specified color depth bit at Y coordinate
         ESP32_I2S_DMA_STORAGE_TYPE *p = getRowDataPtr(y_coord, color_depth_idx, back_buffer_id);
 
-
         // We need to update the correct uint16_t word in the rowBitStruct array pointing to a specific pixel at X - coordinate
         p[x_coord] &= _colorbitclear;   // reset RGB bits
         p[x_coord] |= RGB_output_bits;  // set new RGB bits
@@ -551,7 +558,7 @@ void IRAM_ATTR MatrixPanel_I2S_DMA::updateMatrixDMABuffer(int16_t x_coord, int16
 
 
 /* Update the entire buffer with a single specific colour - quicker */
-void MatrixPanel_I2S_DMA::updateMatrixDMABuffer(uint8_t red, uint8_t green, uint8_t blue)
+void MatrixPanel_I2S_DMA::updateMatrixDMABuffer(uint8_t red, uint8_t green, uint8_t blue, uint16_t _color) 
 {
   if ( !initialized ) return;
   
@@ -561,6 +568,8 @@ void MatrixPanel_I2S_DMA::updateMatrixDMABuffer(uint8_t red, uint8_t green, uint
     green   = lumConvTab[green];
     blue    = lumConvTab[blue];     
 #endif
+
+  memset( _matrixbuff, _color, sizeof(uint16_t) * (m_cfg.mx_width * m_cfg.mx_height)); 
 
   for(uint8_t color_depth_idx=0; color_depth_idx<PIXEL_COLOR_DEPTH_BITS; color_depth_idx++)  // color depth - 8 iterations
   {
@@ -617,6 +626,8 @@ void MatrixPanel_I2S_DMA::updateMatrixDMABuffer(uint8_t red, uint8_t green, uint
 void MatrixPanel_I2S_DMA::clearFrameBuffer(bool _buff_id){
   if (!initialized)
     return;
+
+  memset( _matrixbuff, 0, sizeof(uint16_t) * (m_cfg.mx_width * m_cfg.mx_height)); 
 
   // we start with iterating all rows in dma_buff structure
   int row_idx = dma_buff.rowBits.size();
@@ -1030,6 +1041,63 @@ void MatrixPanel_I2S_DMA::fillRectDMA(int16_t x, int16_t y, int16_t w, int16_t h
       hlineDMA(x, y+h, w, r,g,b);
     } while(h);
   }
+}
+
+//  -------사용자 정의 함수--------------//
+/**
+ * @brief 입력 받은 사각형 영역 copy 
+ * 
+ * @param x x 기준 위치
+ * @param y y 기준 위치
+ * @param w 넓이
+ * @param h 높이
+ * @param _bitmap 해당 영역 복사 받을 bitmap 배열 포인터 주소
+ */
+void MatrixPanel_I2S_DMA::copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap) {
+
+}
+
+/**
+ * @brief color HSV to color 565
+ * 
+ * @param hue 
+ * @param sat 
+ * @param val 
+ * @return uint16_t color 565 value
+ */
+uint16_t MatrixPanel_I2S_DMA::colorHSV(long hue, uint8_t sat, uint8_t val) {
+  uint8_t  r, g, b, lo;
+  uint16_t s1, v1;
+
+  // Hue ( 0 - 1535 )
+  hue %= 1536;
+  if (hue < 0) hue += 1536;
+  lo = hue & 255;          // Low byte  = primary/secondary color mix
+  switch (hue >> 8) {      // High byte = sextant of colorwheel
+    case 0 : r = 255     ; g =  lo     ; b =   0     ; break; // R to Y
+    case 1 : r = 255 - lo; g = 255     ; b =   0     ; break; // Y to G
+    case 2 : r =   0     ; g = 255     ; b =  lo     ; break; // G to C
+    case 3 : r =   0     ; g = 255 - lo; b = 255     ; break; // C to B
+    case 4 : r =  lo     ; g =   0     ; b = 255     ; break; // B to M
+    default: r = 255     ; g =   0     ; b = 255 - lo; break; // M to R
+  }
+
+  s1 = sat + 1;
+  r  = 255 - (((255 - r) * s1) >> 8);
+  g  = 255 - (((255 - g) * s1) >> 8);
+  b  = 255 - (((255 - b) * s1) >> 8);
+
+  v1 = val + 1;
+  r = (r * v1) >> 11;
+  g = (g * v1) >> 11;
+  b = (b * v1) >> 11;
+
+  return this->color565(r, g, b);
+}
+
+
+void MatrixPanel_I2S_DMA::printEx() {
+
 }
 
 #endif  // NO_FAST_FUNCTIONS
