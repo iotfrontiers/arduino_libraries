@@ -763,6 +763,18 @@ inline void MatrixPanel_I2S_DMA::drawPixelBorderCheck(int16_t x, int16_t y, uint
 
   uint8_t r,g,b;
   color565to888(color,r,g,b);
+
+  if (is_color_wheel) { //  color change effect 효과 적용 (같은 값에 대해 같이 변화되도록 random() 사용하지 않음)
+    if (color != 0) {
+      r += hue_color + 0;
+      g += hue_color + 10;
+      b += hue_color + 20;
+
+      r = r % 255;
+      g = g % 255;
+      b = b % 255;
+    }
+  }
   
   updateMatrixDMABuffer( x, y, r, g, b, color);
 } 
