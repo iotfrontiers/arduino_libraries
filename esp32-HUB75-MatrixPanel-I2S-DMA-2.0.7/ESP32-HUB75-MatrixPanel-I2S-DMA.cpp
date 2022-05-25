@@ -1054,7 +1054,13 @@ void MatrixPanel_I2S_DMA::fillRectDMA(int16_t x, int16_t y, int16_t w, int16_t h
  * @param _bitmap 해당 영역 복사 받을 bitmap 배열 포인터 주소
  */
 void MatrixPanel_I2S_DMA::copyRGBBitmapRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* _bitmap) {
+  int idx = 0;    
 
+  for (int j= 0; j < h; j++) {
+    for (int i = 0; i < w; i++) {
+      _bitmap[idx++] = _matrixbuff[(j + y) * m_cfg.mx_width + (i + x)];
+    }
+  }
 }
 
 /**
