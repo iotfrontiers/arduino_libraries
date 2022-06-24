@@ -232,7 +232,7 @@ struct  HUB75_I2S_CFG {
   /**
    * I2S clock speed selector
    */
-  enum clk_speed {HZ_10M=10000000, HZ_20M=20000000};
+  enum clk_speed {HZ_10M=10000000, HZ_13M=13000000, HZ_20M=20000000};
 
   // Structure Variables
 
