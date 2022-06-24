@@ -317,7 +317,8 @@ class MatrixPanel_I2S_DMA {
 
   // ------- PUBLIC -------
   public:
-
+  //  led gamma on off
+  bool gamma_enable = true;;
     /**
      * MatrixPanel_I2S_DMA
      *
