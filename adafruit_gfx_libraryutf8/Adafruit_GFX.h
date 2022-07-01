@@ -120,6 +120,7 @@ class Adafruit_GFX : public Print {
     setTextColor(uint16_t c, uint16_t bg),
     setTextSize(uint8_t s),
     setTextWrap(boolean w),
+    setTextSpace(int16_t space),
     cp437(boolean x=true),
     setFont(const GFXfont *f = NULL),
     getTextBounds(const char *string, int16_t x, int16_t y,
@@ -164,7 +165,8 @@ class Adafruit_GFX : public Print {
     _width,         ///< Display width as modified by current rotation
     _height,        ///< Display height as modified by current rotation
     cursor_x,       ///< x location to start print()ing text
-    cursor_y;       ///< y location to start print()ing text
+    cursor_y,       ///< y location to start print()ing text
+    text_x_space = 0; //  텍스트 간의 x 좌표 공백
   uint16_t
     textcolor,      ///< 16-bit background color for print()
     textbgcolor;    ///< 16-bit text color for print()

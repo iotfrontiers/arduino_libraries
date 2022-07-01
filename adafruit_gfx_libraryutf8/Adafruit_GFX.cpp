@@ -1454,7 +1454,7 @@ size_t Adafruit_GFX::write(uint8_t data, uint16_t _textColor) {
                     }
                     drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
                 }
-                cursor_x += (uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+                cursor_x += ((uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize) + text_x_space;
             }
         }
 
@@ -1505,7 +1505,7 @@ size_t Adafruit_GFX::write(uint8_t data) {
                     }
                     drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
                 }
-                cursor_x += (uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+                cursor_x += ((uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize) + text_x_space;
             }
         }
 
@@ -1587,6 +1587,16 @@ void Adafruit_GFX::setTextColor(uint16_t c, uint16_t b) {
 /**************************************************************************/
 void Adafruit_GFX::setTextWrap(boolean w) {
     wrap = w;
+}
+
+/**************************************************************************/
+/*!
+    @brief  텍스트 사이간의 간격
+    @param  space 간격 값 Value
+*/
+/**************************************************************************/
+void Adafruit_GFX::setTextSpace(int16_t space) {
+    text_x_space = space;
 }
 
 /**************************************************************************/
