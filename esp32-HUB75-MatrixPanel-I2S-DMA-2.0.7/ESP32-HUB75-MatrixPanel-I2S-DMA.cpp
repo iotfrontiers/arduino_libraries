@@ -869,9 +869,13 @@ void MatrixPanel_I2S_DMA::hlineDMA(int16_t x_coord, int16_t y_coord, int16_t l, 
   if ( !initialized )
     return;
 
-  if ( x_coord < 0 || y_coord < 0 || l < 1 || x_coord >= PIXELS_PER_ROW || y_coord >= m_cfg.mx_height)
-    return;
 
+  //  border 그리지 않도록 설정
+  int border_offSet = 0;
+  border_offSet = this->border_count;  //  현재 border count
+
+  if (x_coord < 0 + border_offSet || x_coord >= this->m_cfg.mx_width - border_offSet || y_coord < 0 + border_offSet || y_coord >= this->m_cfg.mx_height - border_offSet) //  테두리 영역인 경우 return;
+    return; 
 
   l = ( (x_coord + l) >= PIXELS_PER_ROW ) ? (PIXELS_PER_ROW - x_coord):l; 
 
@@ -952,8 +956,12 @@ void MatrixPanel_I2S_DMA::vlineDMA(int16_t x_coord, int16_t y_coord, int16_t l, 
   if ( !initialized )
     return;
 
-  if ( x_coord < 0 || y_coord < 0 || l < 1 || x_coord >= PIXELS_PER_ROW || y_coord >= m_cfg.mx_height)
-    return;
+  //  border 그리지 않도록 설정
+  int border_offSet = 0;
+  border_offSet = this->border_count;  //  현재 border count
+
+  if (x_coord < 0 + border_offSet || x_coord >= this->m_cfg.mx_width - border_offSet || y_coord < 0 + border_offSet || y_coord >= this->m_cfg.mx_height - border_offSet) //  테두리 영역인 경우 return;
+    return;  
 
   // check for a length that goes beyond the height of the screen! Array out of bounds dma memory changes = screwed output #163
   l = ( (y_coord + l) >= m_cfg.mx_height ) ? (m_cfg.mx_height - y_coord):l; 
