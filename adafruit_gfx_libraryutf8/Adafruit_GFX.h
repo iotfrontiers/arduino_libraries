@@ -64,6 +64,8 @@ class Adafruit_GFX : public Print {
     
     drawBitmapClearEx(int16_t xOffset, int16_t yOffset,
   uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),     
+    drawRGBBitmapExNonClear(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h),   
     drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
   uint16_t *bitmap, int16_t w, int16_t h),   
     drawRGBBitmapClearEx(int16_t xOffset, int16_t yOffset,

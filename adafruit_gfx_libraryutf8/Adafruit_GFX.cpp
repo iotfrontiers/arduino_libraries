@@ -1096,6 +1096,41 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
     endWrite();
 }
 
+/**
+ * @brief bitmap 영역 제외 지우지 않는 draw 함수
+ */
+void Adafruit_GFX::drawRGBBitmapExNonClear(int16_t xOffset, int16_t yOffset,
+  uint16_t *bitmap, int16_t w, int16_t h) {
+    startWrite();  
+    
+    // Serial.printf("before xOffset : %d \n", xOffset);
+    int16_t idx = 0;
+    int16_t x = 0, y = yOffset;
+
+    if (xOffset < 0) {
+        xOffset *= -1;
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i= xOffset; i<w; i++, idx++) {
+                if ((bitmap[j * w + i]) != 0) drawPixelBorderCheck(x+idx, y, bitmap[j * w + i]);
+            }
+            idx = 0;
+        }
+        // Serial.printf("음수 after xOffset : %d \n", xOffset);
+    } else {     // y = j, i = w
+        for(int16_t j = 0; j < h; j++, y++) {
+            for(int16_t i = 0; i < (w - xOffset) ; i++) {
+                if ((bitmap[j * w + i]) != 0) drawPixelBorderCheck((x+i+xOffset), y, bitmap[j * w + i]);
+            }
+        }
+        // Serial.printf("양수 after xOffset : %d \n", xOffset);
+    }  
+    endWrite();
+    //        buffer[x + y * WIDTH] = color;
+}
+
+/**
+ * @brief bitmap 영역 제외 지우는 draw 함수
+ */
 void Adafruit_GFX::drawRGBBitmapEx(int16_t xOffset, int16_t yOffset,
   uint16_t *bitmap, int16_t w, int16_t h) {
     startWrite();  
